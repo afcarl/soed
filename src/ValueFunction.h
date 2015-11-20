@@ -1,7 +1,14 @@
 #ifndef ValueFunction_h
 #define ValueFunction_h
 
+#include <functional>
+#include <tuple>
+#include <vector>
+#include <memory>
+
 #include <Eigen/Core>
+
+#include "State.h"
 
 class ValueFunction
 {
@@ -14,7 +21,7 @@ public:
   Eigen::VectorXd coefficients;
 
   virtual double Evaluate(std::shared_ptr<const State> state);
-  virtual double Train(const std::vector<std::shared_ptr<const State>> states, const std::vector<double> costs);
+  virtual void Train(const std::vector<std::shared_ptr<const State>> states, const Eigen::VectorXd& costs);
 
 };
 
