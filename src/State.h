@@ -14,15 +14,15 @@ class State
 
 public:
 
-  virtual double GetMean() const;
+  virtual double GetMean();
   
-  virtual double GetVariance() const;
+  virtual double GetVariance();
   
-  virtual std::pair<double, double> GetMoments() const;
+  virtual std::pair<double, double> GetMoments();
   
-  virtual double GetKL(std::shared_ptr<State> other) const;
+  virtual double GetKL(std::shared_ptr<State> other);
   
-  virtual std::shared_ptr<State> GetNextState(std::shared_ptr<const Model>, const double control, const double disturbance) const;
+  virtual std::shared_ptr<State> GetNextState(std::shared_ptr<const Model>, const double control, const double disturbance);
 
 };
 
