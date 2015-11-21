@@ -1,20 +1,45 @@
 #ifndef MossbauerModel_h
 #define MossbauerModel_h
 
+#include <cmath>
+
+#include "RandomGenerator.h"
 #include "Model.h"
 
 class MossbauerModel : public Model 
 {
 
+private:
+
+  double priorMean;
+  double priorVariance;
+  double noiseVariance;
+
 public:
 
-  double Evaluate(const double theta, const double d);
+  MossbauerModel(const double priorMean = 0, const double priorVariance = 0, const double noiseVariance = 0.01) : 
+    priorMean(priorMean), priorVariance(priorVariance), noiseVariance(noiseVariance) { }
+
+  inline double Evaluate(const double theta, const double control) 
+  {
+    return 1.0 - 0.1 / ((theta - control) * (theta - control) + 0.1;
+  }
   
-  double GetLogLikelihood(double theta, double control, double disturbance) override;
+  inline double GetLogLikelihood(double theta, double control, double disturbance) override
+  {
+    double output = Evaluate(theta, control);
+    return -0.5 * log(2.0 * M_PI * noiseVariance) - (output - disturbance) * (output - disturbance) / (2.0 * noiseVariance);
+  }
   
-  double GetDisturbance(double theta, double control) override;
+  inline double GetDisturbance(double theta, double control) override
+  {
+    return Evaluate(theta, control) + RandomGenerator::GetNormal() * sqrt(noiseVariance);
+  }
   
-  double GetPriorSample() override;
+  inline double GetPriorSample() override
+  {
+    return priorMean + RandomGenerator::GetNormal() * sqrt(priorVariance);
+  }
 
 };
 
