@@ -16,8 +16,9 @@ public:
   std::shared_ptr<Model> model;
   
   int stages;
-
-  DPSolver(const int stages, std::shared_ptr<const Model> model) : stages(stages), model(model) { }
+  
+  // solver initializes valueFunctions
+  DPSolver(const int stages, std::shared_ptr<const Model> model);
 
   std::vector<std::shared_ptr<ValueFunction>> valueFunctions;
   
