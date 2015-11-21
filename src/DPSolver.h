@@ -17,7 +17,7 @@ public:
   
   int stages;
   
-  // solver initializes valueFunctions
+  // solver initializes valueFunctions, making sure the last element is of type TerminalValueFunction
   DPSolver(const int stages, std::shared_ptr<const Model> model);
 
   std::vector<std::shared_ptr<ValueFunction>> valueFunctions;
