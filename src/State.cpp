@@ -29,6 +29,9 @@ double State::GetKL(std::shared_ptr<const State> other)
 
 std::shared_ptr<State> State::GetNextState(std::shared_ptr<const Model>, const double control, const double disturbance)
 {
-  // make copy of current state
-  auto std::make_shared<State>(this)
+  auto std::make_shared<State> newState(numParticles);
+  for (int i = 0; i < numParticles; ++i) {
+    newState->particles[i] = particles[i];
+    newState->logWeights[i] =  logWeights[i] + model->GetLogLikelihood(newState->particles[i], control, disturbance);
+  }
 }
