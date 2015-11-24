@@ -1,6 +1,11 @@
 #include "State.h"
 
-State::State(const int numParticles);
+State::State(const int numParticles)
+{
+  this->numParticles = numParticles;
+  this->particles.resize(numParticles);
+  this->logWeights.resize(numParticles);
+}
 
 std::pair<double, double> State::GetMoments()
 {
