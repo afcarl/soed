@@ -8,9 +8,8 @@ double ValueFunction::Evaluate(shared_ptr<const State> state)
 {
   auto moments = state->GetMoments();
   double sum = 0;
-  for (size_t i = 0; i < basisFunctions.size(); ++i) {
+  for (size_t i = 0; i < basisFunctions.size(); ++i)
     sum += coefficients(i) * basisFunctions[i](moments.first, moments.second);
-  }
   return sum; 
 }
 
