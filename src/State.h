@@ -20,9 +20,9 @@ public:
   std::vector<double> logWeights;
   
   State(const int numParticles);
-  std::pair<double, double> GetMoments();
+  std::pair<double, double> GetMoments() const;
   double GetKL(std::shared_ptr<const State> other);
-  std::shared_ptr<State> GetNextState(std::shared_ptr<const Model>, const double control, const double disturbance);
+  std::shared_ptr<State> GetNextState(std::shared_ptr<const Model>, const double control, const double disturbance) const;
 
 };
 
