@@ -34,4 +34,5 @@ std::shared_ptr<State> State::GetNextState(std::shared_ptr<const Model>, const d
     newState->particles[i] = particles[i];
     newState->logWeights[i] =  logWeights[i] + model->GetLogLikelihood(newState->particles[i], control, disturbance);
   }
+  return newState;
 }
