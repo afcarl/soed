@@ -41,7 +41,6 @@ int main(int argc, char** argv) {
   auto prior = make_shared<State>();
   for (int i = 0; i < numParticles; ++i)
     prior->AddParticle(model->GetPriorSample());
-  prior->Normalize();
   
   states[0] = prior;
   
