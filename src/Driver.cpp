@@ -4,9 +4,9 @@
 #include "MossbauerModel.h"
 #include "State.h"
 #include "DPSolver.h"
+#include "Utilities.h"
 
 using namespace std;
-using namespace Eigen;
 
 int main(int argc, char** argv) {
 
