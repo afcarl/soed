@@ -1,6 +1,7 @@
 #ifndef State_h
 #define State_h
 
+#include <cmath>
 #include <tuple>
 #include <vector>
 #include <memory>
