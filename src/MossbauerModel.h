@@ -18,8 +18,8 @@ private:
 public:
 
   inline void SetPriorMean(const double priorMean) { this->priorMean = priorMean; }
-  inline void SetPriorMean(const double priorMean) { this->priorMean = priorMean; }
-  inline void SetPriorMean(const double priorMean) { this->priorMean = priorMean; }
+  inline void SetPriorVariance(const double priorVariance) { this->priorVariance = priorVariance; }
+  inline void SetNoiseVariance(const double noiseVariance) { this->noiseVariance = noiseVariance; }
 
   inline double Evaluate(const double theta, const double control) 
   {
