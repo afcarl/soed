@@ -80,7 +80,6 @@ public:
     auto std::make_shared<State> newState();
     for (size_t i = 0; i < particles.size(); ++i)
       newState->AddParticle(particles[i], logWeights[i] + model->GetLogLikelihood(particles[i], control, disturbance));
-    newState->NormalizeWeights();
     return newState;
   }
 
