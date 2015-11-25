@@ -1,8 +1,6 @@
 #ifndef ValueFunction_h
 #define ValueFunction_h
 
-#include <functional>
-#include <tuple>
 #include <vector>
 #include <memory>
 
