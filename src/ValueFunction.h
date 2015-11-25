@@ -16,7 +16,7 @@ class ValueFunction
 public:
 
   // Collection of basis functions that take the first two moments from State::GetMoments()
-  static std::vector<std::function<double(const std::pair<double, double>)>> basisFunctions;
+  static std::vector<std::function<double(double, double)>> basisFunctions;
 
   Eigen::VectorXd coefficients;
 
