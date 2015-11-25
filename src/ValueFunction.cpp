@@ -1,10 +1,7 @@
 #include <Eigen/Dense>
 #include "ValueFunction.h"
 
-using namespace std;
-using namespace Eigen;
-
-double ValueFunction::Evaluate(shared_ptr<const State> state)
+double ValueFunction::Evaluate(std::shared_ptr<const State> state)
 {
   auto moments = state->GetMoments();
   double sum = 0;
@@ -13,9 +10,9 @@ double ValueFunction::Evaluate(shared_ptr<const State> state)
   return sum; 
 }
 
-void ValueFunction::Train(const vector<shared_ptr<const State>> states, const VectorXd& costs)
+void ValueFunction::Train(const std::vector<std::shared_ptr<const State>> states, const Eigen::VectorXd& costs)
 {
-  MatrixXd X(states.size(), basisFunctions.size());
+  Eigen::MatrixXd X(states.size(), basisFunctions.size());
   for (size_t i = 0; i < states.size(); ++i) {
     auto moments = states[i]->GetMoments();
     for (size_t j = 0; j < basisFunctions.size(); ++j)
@@ -23,4 +20,3 @@ void ValueFunction::Train(const vector<shared_ptr<const State>> states, const Ve
   }
   coefficients = (X.transpose() * X).ldlt().solve(X.transpose() * costs);
 }
-
