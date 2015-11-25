@@ -11,18 +11,24 @@
 class DPSolver
 {
 
-public:
-  
-  std::shared_ptr<Model> model;
-  
-  int stages;
-  
-  // solver initializes valueFunctions, making sure the last element is of type TerminalValueFunction
-  DPSolver(const int stages, std::shared_ptr<const Model> model);
+private:
 
+  int numStages;
+  std::shared_ptr<Model> model;
+  int numTrainingSamples;
+  int numParticles;
+  int numGridpoints;
   std::vector<std::shared_ptr<ValueFunction>> valueFunctions;
   
-  // returns optimal control and value 
+public:
+
+  inline void SetNumStages(const int numStages) { this->numStages = numStages; }
+  inline void SetModel(std::shared_ptr<const Model> model) { this->model = model; }
+  inline void SetNumTrainingSamples(const int numTrainingSamples) { this->numTrainingSamples = numTrainingSamples; }
+  inline void SetNumParticles(const int numParticles) { this->numParticles = numParticles; }
+  inline void SetNumGridpoints(const int numGridpoints) { this->numGridpoints = numGridpoints; }
+  
+  // returns optimal control and value as a std::pair
   std::pair<double, double> GetOptimalControl(std::shared_ptr<const State> state, std::shared_ptr<const ValueFunction> nextValueFunction);
 
   // solves Bellman's equation
