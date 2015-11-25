@@ -32,6 +32,12 @@ int main(int argc, char** argv) {
   solver->SetNumTrainingSamples(numTrainingSamples);
   solver->SetNumGridpoints(numGridpoints);
   
+  ValueFunction::basisFunctions.push_back([](double mean, double variance) { return 1; });
+  ValueFunction::basisFunctions.push_back([](double mean, double variance) { return mean; });
+  ValueFunction::basisFunctions.push_back([](double mean, double variance) { return mean * mean; });
+  ValueFunction::basisFunctions.push_back([](double mean, double variance) { return log(sqrt(variance)); });
+  ValueFunction::basisFunctions.push_back([](double mean, double variance) { return variance; });
+
   vector<shared_ptr<State>> states(numStages);
   vector<double> controls(numStages);
   vector<double> costsToGo(numStages);
