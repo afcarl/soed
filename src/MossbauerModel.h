@@ -17,8 +17,9 @@ private:
 
 public:
 
-  MossbauerModel(const double priorMean = 0, const double priorVariance = 0, const double noiseVariance = 0.01) : 
-    priorMean(priorMean), priorVariance(priorVariance), noiseVariance(noiseVariance) { }
+  inline void SetPriorMean(const double priorMean) { this->priorMean = priorMean; }
+  inline void SetPriorMean(const double priorMean) { this->priorMean = priorMean; }
+  inline void SetPriorMean(const double priorMean) { this->priorMean = priorMean; }
 
   inline double Evaluate(const double theta, const double control) 
   {
