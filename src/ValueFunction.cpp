@@ -1,3 +1,4 @@
+#include <functional>
 #include <Eigen/Dense>
 #include "ValueFunction.h"
 
