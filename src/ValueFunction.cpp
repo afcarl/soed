@@ -1,6 +1,14 @@
 #include <Eigen/Dense>
 #include "ValueFunction.h"
 
+std::vector<std::function<double(double, double)>> ValueFunction::basisFunctions = {
+  [](double mean, double variance) { return 1; },
+  [](double mean, double variance) { return mean; },
+  [](double mean, double variance) { return mean * mean; },
+  [](double mean, double variance) { return log(sqrt(variance)); },
+  [](double mean, double variance) { return variance; }
+};
+
 double ValueFunction::Evaluate(std::shared_ptr<const State> state)
 {
   auto moments = state->GetMoments();
