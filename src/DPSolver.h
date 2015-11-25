@@ -18,7 +18,7 @@ private:
   int numTrainingSamples;
   int numGridpoints;
   std::vector<std::shared_ptr<ValueFunction>> valueFunctions;
-  
+
 public:
 
   inline void SetNumStages(const int numStages) { this->numStages = numStages; }
@@ -32,10 +32,11 @@ public:
   // solves Bellman's equation
   void Solve(std::shared_ptr<const State> prior);
   
-  void ComputeTrainingPoints();
-  
-  void TrainValueFunctions();
+private:
 
+  void ComputeTrainingPoints();
+  void TrainValueFunctions();
+  
 };
 
 #endif // ifndef DPSolver_h
