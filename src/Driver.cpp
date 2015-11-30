@@ -1,5 +1,6 @@
 #include <memory>
 #include <vector>
+#include <Eigen/Core>
 
 #include "MossbauerModel.h"
 #include "State.h"
@@ -57,8 +58,6 @@ int main(int argc, char** argv) {
   }
   
   // dump stuff to files
-  
-  
   
   return 0;
   
