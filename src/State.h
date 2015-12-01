@@ -8,6 +8,8 @@
 #include <numeric>
 #include <algorithm>
 
+#include <Eigen/Core>
+
 #include "Model.h"
 
 class State
@@ -104,6 +106,16 @@ public:
       }
     }
     return particles[particles.size()-1];
+  }
+  
+  inline Eigen::MatrixXd GetEigenMatrix()
+  {
+    Eigen::MatrixXd matrix(particles.size(), 2);
+    for (size_t i = 0; i < particles.size(); ++i) {
+      matrix(i, 0) = particles[i];
+      matrix(i, 1) = logWeights[i];
+    }
+    return matrix;
   }
 
 };
