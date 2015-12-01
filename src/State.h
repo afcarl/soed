@@ -88,17 +88,20 @@ public:
   // get a sample from the state
   inline double GetSample()
   {
-    double uniformRandomNumber = ((double) rand() / (RAND_MAX));
-    double cumulativeSum = 0;
-    size_t i;
-    for (i = 0; i < particles.size(); ++i) {
+    double sumWeights = 0;
+    for (size_t i = 0; i < particles.size(); ++i) {
+      sumWeights += exp(logWeights[i]);
+    }
+    double sum = 0;
+    double threshold = RandomGenerate::GetUniform();
+    for (size_t i = 0; i < particles.size(); ++i) {
       double weight = exp(logWeights[i]);
-      cumulativeSum += weight;
-      if (cumulativeSum > uniformRandomNumber){
-        break;
+      sum += weight;
+      if (sum / sumWeights > threshold) {
+        return particles[i];
       }
     }
-    return particles[i];
+    return particles[particles.size()-1];
   }
 
 };
