@@ -30,6 +30,9 @@ public:
   
   // returns optimal control and value as a std::pair
   std::pair<double, double> GetOptimalControl(std::shared_ptr<const State> state, std::shared_ptr<const ValueFunction> nextValueFunction);
+  
+  // returns optimal control and value as a std::pair, uses member variable valueFunctions indexed by stage
+  std::pair<double, double> GetOptimalControl(std::shared_ptr<const State> state, const int stage);
 
   // solves Bellman's equation
   void Solve(std::shared_ptr<const State> prior);
