@@ -9,8 +9,8 @@ class RandomGenerator
 
     static std::mt19937 engine;
     static bool isInitialized;
-    std::normal_distribution<double> normalDist;
-    std::uniform_real_distribution<double> uniformDist;
+    static std::normal_distribution<double> normalDist;
+    static std::uniform_real_distribution<double> uniformDist;
 
     inline static void Initialize()
     {
