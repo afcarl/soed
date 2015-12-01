@@ -10,6 +10,10 @@ public:
   
   virtual double GetDisturbance(double theta, double control) = 0;
   
+  virtual double GetDisturbance(double theta, double control, double noise) = 0;
+  
+  virtual double GetNoiseSample() = 0;
+  
   virtual double GetPriorSample() = 0;
 
 };
