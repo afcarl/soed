@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
   int numTrainingSamples = GetOption<int>(argc, argv, "-numTrainingSamples", 100);
   int numParticles       = GetOption<int>(argc, argv, "-numParticles", 1000);
   int numGridpoints      = GetOption<int>(argc, argv, "-numGridpoints", 21);
+  int numExpectation     = GetOption<int>(argc, argv, "-numExpectation", 100);
   
   double priorMean       = GetOption<double>(argc, argv, "-priorMean", 0.0);
   double priorVariance   = GetOption<double>(argc, argv, "-priorVariance", 1.0);
@@ -32,25 +33,27 @@ int main(int argc, char** argv) {
   solver->SetModel(model);
   solver->SetNumTrainingSamples(numTrainingSamples);
   solver->SetNumGridpoints(numGridpoints);
-  
-  vector<shared_ptr<State>> states(numStages);
-  vector<double> controls(numStages);
-  vector<double> costsToGo(numStages);
-  vector<double> disturbances(numStages);
+  solver->SetNumExpectation(numExpectation);
   
   // create prior State
   auto prior = make_shared<State>();
   for (int i = 0; i < numParticles; ++i)
     prior->AddParticle(model->GetPriorSample());
   
+  // compute optimal policy
+  solver->Solve(prior);
+  
+  // execute the optimal policy on some synthetic data
+  
+  vector<shared_ptr<State>> states(numStages);
+  vector<double> controls(numStages);
+  vector<double> costsToGo(numStages);
+  vector<double> disturbances(numStages);
+  
   states[0] = prior;
   
-  // compute optimal policy
-  solver->Solve(states[0]);
-  
-  // now execute the policy on some data generated using trueTheta
   for (int k = 0; k < numStages - 1; ++k) {
-    auto controlPair = solver->GetOptimalControl(states[k]);
+    auto controlPair = solver->GetOptimalControl(states[k], k);
     controls[k]      = controlPair.first;
     costsToGo[k]     = controlPair.second;
     disturbances[k]  = model->GetDisturbance(trueTheta, controls[k]);
