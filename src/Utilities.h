@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <vector>
 #include <Eigen/Core>
@@ -21,7 +22,7 @@ inline T GetOption(const int argc, char **argv, const std::string& option, const
 inline void WriteEigenBinaryFile(const std::string& path, const Eigen::MatrixXd& m)
 {
   std::ofstream file;
-  file.open(path, ios::out | ios::binary);
+  file.open(path, std::ios::out | std::ios::binary);
   int rows = m.rows();
   int cols = m.cols();
   file.write(reinterpret_cast<char *>(&rows), sizeof(rows));

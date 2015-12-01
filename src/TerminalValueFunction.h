@@ -11,15 +11,15 @@ public:
   std::shared_ptr<State> prior;
 
   TerminalValueFunction(std::shared_ptr<State> prior) : prior(prior) { }
-  
-  inline double Evaluate(std::shared_ptr<const State> state) override
+
+  inline virtual double Evaluate(std::shared_ptr<State> state) override
   {
     return state->GetKL(prior);
   }
-  
-  inline void Train(const std::vector<std::shared_ptr<const State>> states, const Eigen::VectorXd& costs) override 
+
+  inline virtual void Train(const std::vector<std::shared_ptr<State>> states, const Eigen::VectorXd& costs) override
   {
-    // pass  
+    // pass
   }
 
 };

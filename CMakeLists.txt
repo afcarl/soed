@@ -11,6 +11,7 @@ INCLUDE_DIRECTORIES ( "src" "extern/eigen" )
 set(SOURCES
     src/Driver.cpp
     src/DPSolver.cpp
+    src/RandomGenerator.cpp
     src/ValueFunction.cpp)
 
 add_executable(Driver  ${SOURCES})

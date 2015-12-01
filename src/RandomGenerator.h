@@ -9,8 +9,6 @@ class RandomGenerator
 
     static std::mt19937 engine;
     static bool isInitialized;
-    static std::normal_distribution<double> normalDist;
-    static std::uniform_real_distribution<double> uniformDist;
 
     inline static void Initialize()
     {
@@ -24,15 +22,17 @@ class RandomGenerator
     inline static double GetNormal()
     {
       RandomGenerator::Initialize();
-      return RandomGenerator::normalDist(RandomGenerator::engine);
+      std::normal_distribution<double> normalDist;
+      return normalDist(RandomGenerator::engine);
     }
 
     inline static double GetUniform()
     {
       RandomGenerator::Initialize();
-      return RandomGenerator::uniformDist(RandomGenerator::engine);
+      std::uniform_real_distribution<double> uniformDist;
+      return uniformDist(RandomGenerator::engine);
     }
-    
+
 };
 
 #endif // ifndef RandomGenerator_h

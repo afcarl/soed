@@ -10,16 +10,16 @@ std::vector<std::function<double(double, double)>> ValueFunction::basisFunctions
   [](double mean, double variance) { return variance; }
 };
 
-double ValueFunction::Evaluate(std::shared_ptr<const State> state)
+double ValueFunction::Evaluate(std::shared_ptr<State> state)
 {
   auto moments = state->GetMoments();
   double sum = 0;
   for (size_t i = 0; i < basisFunctions.size(); ++i)
     sum += coefficients(i) * basisFunctions[i](moments.first, moments.second);
-  return sum; 
+  return sum;
 }
 
-void ValueFunction::Train(const std::vector<std::shared_ptr<const State>> states, const Eigen::VectorXd& costs)
+void ValueFunction::Train(const std::vector<std::shared_ptr<State>> states, const Eigen::VectorXd& costs)
 {
   Eigen::MatrixXd X(states.size(), basisFunctions.size());
   for (size_t i = 0; i < states.size(); ++i) {
