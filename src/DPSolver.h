@@ -17,6 +17,7 @@ private:
   std::shared_ptr<Model> model;
   int numTrainingSamples;
   int numGridpoints;
+  int numExpectation;
   std::vector<std::shared_ptr<ValueFunction>> valueFunctions;
 
 public:
@@ -24,6 +25,7 @@ public:
   inline void SetNumStages(const int numStages) { this->numStages = numStages; }
   inline void SetModel(std::shared_ptr<const Model> model) { this->model = model; }
   inline void SetNumTrainingSamples(const int numTrainingSamples) { this->numTrainingSamples = numTrainingSamples; }
+  inline void SetNumExpectation(const int SetNumExpectation) { this->SetNumExpectation = SetNumExpectation; }
   inline void SetNumGridpoints(const int numGridpoints) { this->numGridpoints = numGridpoints; }
   
   // returns optimal control and value as a std::pair
