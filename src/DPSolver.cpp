@@ -41,16 +41,39 @@ void Solve(shared_ptr<const State> prior)
     valueFunctions[i] = make_shared<ValueFunction>();
   valueFunctions[numStages - 1] = make_shared<TerminalValueFunction>(prior);
   
-  ComputeTrainingPoints();
-  TrainValueFunctions();
-}
-
-void ComputeTrainingPoints()
-{
+  // compute training points
+  VectorXd priorSamples(numTrainingSamples);
+  vector<vector<shared_ptr<State>>> trajectories; // for each prior sample, compute trajectory of states
   
-}
-
-void TrainValueFunctions()
-{
+  // for each trajectory (read: theta)
+  //   for each stage
+  //     get a disturbance using a random control
+  //     get the next state using that random control and disturbance
+  //     store the state at that stage
+  for (int i = 0; i < numTrainingSamples; ++i) {
+    trajectores[i].push_back(prior->GetCopy());
+    for (int k = 1; k < numStages; ++k) {
+      double control = RandomGenerator::GetUniform() * 2 - 1; // control between [-1, 1]
+      double disturbance = model->GetDisturbance(priorSamples(i), control);
+      trajectories[i].push_back(trajectories[i][k - 1]->GetNextState(model, control, disturbance));
+    }
+  }
+  
+  // for each state (in the trajectory at stage k) we need to find its value by calling GetOptimalControl
+  // and we pass in that state and the next value function
+  // and we get vector of states (for this stage)
+  // and a vector of values, which we pass to Train
+  for (int k = numStages - 2; k >= 0; --k) {
+    vector<shared_ptr<State>> states;
+    VectorXd values(numTrainingSamples);
+    for (int i = 0; i < numTrainingSamples; ++i) {
+      auto controlPair = GetOptimalControl(trajectories[i][k], valueFunctions[k + 1]);
+      double control = controlPair.first;
+      double value = controlPair.second;
+      states.push_back(trajectories[i][k]);
+      values(i) = value;
+    }
+    valueFunctions[k]->Train(states, values);
+  }
   
 }
