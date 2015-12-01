@@ -32,6 +32,11 @@ pair<double, double> GetOptimalControl(shared_ptr<const State> state, shared_ptr
   return make_pair<double, double>(optimalControl, optimalValue);
 }
 
+pair<double, double> GetOptimalControl(shared_ptr<const State> state, const int stage)
+{
+  return GetOptimalControl(state, valueFunctions[stage + 1]);
+}
+
 // solves Bellman's equation
 void Solve(shared_ptr<const State> prior)
 {
