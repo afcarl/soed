@@ -8,6 +8,7 @@
 #include "Utilities.h"
 
 using namespace std;
+using namespace Eigen;
 
 int main(int argc, char** argv) {
 
@@ -22,6 +23,8 @@ int main(int argc, char** argv) {
   double noiseVariance   = GetOption<double>(argc, argv, "-noiseVariance", 0.01);
   
   double trueTheta       = GetOption<double>(argc, argv "-trueTheta", 0.5);
+  
+  string prefix          = GetOption<string>(argc, argv, "-prefix", "test");
   
   auto model = make_shared<MossbauerModel>();
   model->SetPriorMean(priorMean);
@@ -46,9 +49,9 @@ int main(int argc, char** argv) {
   // execute the optimal policy on some synthetic data
   
   vector<shared_ptr<State>> states(numStages);
-  vector<double> controls(numStages);
-  vector<double> costsToGo(numStages);
-  vector<double> disturbances(numStages);
+  VectorXd controls(numStages);
+  VectorXd costsToGo(numStages);
+  VectorXd disturbances(numStages);
   
   states[0] = prior;
   
@@ -61,7 +64,15 @@ int main(int argc, char** argv) {
   }
   
   // dump stuff to files
+  WriteEigenBinaryFile(prefix + ".controls", controls);
   
+  // concatenate state matrices
+  MatrixXd stateMatrix(numParticles, 2 * numStages);
+  for (int k = 0; k < numStages; ++k) {
+    stateMatrix.block(0, 2 * k, numParticles, 2) = states[k]->GetEigenMatrix();
+  }
+  WriteEigenBinaryFile(prefix + ".states", stateMatrix);
+
   return 0;
   
 }
