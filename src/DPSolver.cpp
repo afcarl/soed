@@ -10,11 +10,20 @@ pair<double, double> GetOptimalControl(shared_ptr<const State> state, shared_ptr
   // enumerate all controls and values on a grid
   VectorXd controls = VectorXd::LinSpaced(-1, 1, numGridpoints); 
   VectorXd values = VectorXd::Zeros(numGridpoints); 
+  VectorXd theta(numExpectation);
+  VectorXd noise(numExpectation);
+  for (int i = 0; i < numExpectation; ++i) {
+    theta(i) = state->GetSample();
+    noise(i) = model->GetNoiseSample();
+  }
   for (int i = 0; i < numGridpoints; ++i) {
-    // WHAT IS THETA??
-    auto disturbance = model->GetDisturbance(theta, controls(i));
-    auto nextState = state->GetNextState(model, controls(i), disturbance);
-    values(i) = nextValueFunction->Evaluate(nextState);
+    double value = 0;
+    for (int j = 0; j < numExpectation) {
+      auto disturbance = model->GetDisturbance(theta(j), controls(i), noise(j));
+      auto nextState = state->GetNextState(model, controls(i), disturbance);
+      value += nextValueFunction->Evaluate(nextState);
+    }
+    values(i) = value / numExpectation;
   }
   // return optimal control and value among enumerated values 
   VectorXd::Index optimalIndex;
