@@ -19,6 +19,9 @@ private:
   
 public:
 
+  // copy constructor
+  inline std::shared_ptr<State> GetCopy() { }
+
   inline void SetParticles(const std::vector<double>& particles) { this->particles = particles; }
   inline void SetLogWeights(const std::vector<double>& logWeights) { this->logWeights = logWeights; }
   
