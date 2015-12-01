@@ -7,6 +7,7 @@
 #include <memory>
 #include <numeric>
 #include <algorithm>
+#include <stdlib>
 
 #include "Model.h"
 
@@ -82,6 +83,22 @@ public:
     for (size_t i = 0; i < particles.size(); ++i)
       newState->AddParticle(particles[i], logWeights[i] + model->GetLogLikelihood(particles[i], control, disturbance));
     return newState;
+  }
+  
+  // get a sample from the state
+  inline double GetSample()
+  {
+    double uniformRandomNumber = ((double) rand() / (RAND_MAX));
+    double cumulativeSum = 0;
+    size_t i;
+    for (i = 0; i < particles.size(); ++i) {
+      double weight = exp(logWeights[i]);
+      cumulativeSum += weight;
+      if (cumulativeSum > uniformRandomNumber){
+        break;
+      }
+    }
+    return particles[i];
   }
 
 };
