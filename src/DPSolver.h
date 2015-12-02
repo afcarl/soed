@@ -27,6 +27,7 @@ public:
   inline void SetNumTrainingSamples(const int numTrainingSamples) { this->numTrainingSamples = numTrainingSamples; }
   inline void SetNumExpectation(const int numExpectation) { this->numExpectation = numExpectation; }
   inline void SetNumGridpoints(const int numGridpoints) { this->numGridpoints = numGridpoints; }
+  inline void SetValueFunctions(std::vector<std::shared_ptr<ValueFunction>> valueFunctions) {this->valueFunctions = valueFunctions; }
 
   // returns optimal control and value as a std::pair
   std::pair<double, double> GetOptimalControl(std::shared_ptr<State> state, std::shared_ptr<ValueFunction> nextValueFunction);
