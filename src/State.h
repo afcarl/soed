@@ -3,10 +3,7 @@
 
 #include <cmath>
 #include <tuple>
-#include <vector>
 #include <memory>
-#include <numeric>
-#include <algorithm>
 
 #include <Eigen/Core>
 
@@ -15,63 +12,34 @@
 
 class State
 {
-private:
-
-  std::vector<double> particles;
-  std::vector<double> logWeights;
 
 public:
 
-  // copy constructor
+  Eigen::VectorXd particles;
+  Eigen::VectorXd logWeights;
+
+  inline void SetParticles(const Eigen::VectorXd& particles)   { this->particles  = particles; }
+  inline void SetLogWeights(const Eigen::VectorXd& logWeights) { this->logWeights = logWeights; }
+
+  State(const Eigen::VectorXd& particles, const Eigen::VectorXd& logWeights)
+  {
+    SetParticles(particles);
+    SetLogWeights(logWeights);
+  }
+
   inline std::shared_ptr<State> GetCopy()
   {
-    auto newState = std::make_shared<State>();
-    for (size_t i = 0; i < particles.size(); ++i)
-      newState->AddParticle(particles[i], logWeights[i]);
-    return newState;
-  }
-
-  inline void SetParticles(const std::vector<double>& particles) { this->particles = particles; }
-  inline void SetLogWeights(const std::vector<double>& logWeights) { this->logWeights = logWeights; }
-
-  inline void AddParticle(const double particle, const double logWeight = 0)
-  {
-    particles.push_back(particle);
-    logWeights.push_back(logWeight);
-  }
-
-  inline void NormalizeWeights()
-  {
-    double maxCoeff = *std::max_element(logWeights.begin(), logWeights.end());
-    double sumExp = 0;
-    for (size_t i = 0; i < logWeights.size(); ++i)
-      sumExp += exp(logWeights[i] - maxCoeff);
-    double logSumExp = maxCoeff + log(sumExp);
-
-    for (size_t i = 0; i < logWeights.size(); ++i)
-      logWeights[i] -= logSumExp;
+    return std::make_shared<State>(particles, logWeights);
   }
 
   inline std::pair<double, double> GetMoments()
   {
-    double mean = 0;
-    double sumWeights = 0;
-    for (size_t i = 0; i < particles.size(); ++i) {
-      double weight = exp(logWeights[i]);
-      sumWeights += weight;
-      mean += weight * particles[i];
-    }
-    mean = mean / sumWeights;
-
-    double variance = 0;
-    double sumSquaredWeights = 0;
-    for (size_t i = 0; i < particles.size(); ++i) {
-      double weight = exp(logWeights[i]);
-      sumSquaredWeights += weight * weight;
-      variance += weight * (particles[i] - mean) * (particles[i] - mean);
-    }
+    auto weights = logWeights.array().exp();
+    double sumWeights = weights.sum();
+    double sumSquaredWeights = weights.square().sum();
+    double mean = (weights * particles.array()).sum() / sumWeights;
+    double variance = (weights * ((particles.array() - mean).square())).sum();
     variance = sumWeights / (sumWeights * sumWeights - sumSquaredWeights) * variance;
-
     return std::make_pair(mean, variance);
   }
 
@@ -90,39 +58,27 @@ public:
 
   inline std::shared_ptr<State> GetNextState(std::shared_ptr<Model> model, const double control, const double disturbance)
   {
-    auto newState = std::make_shared<State>();
-    for (size_t i = 0; i < particles.size(); ++i)
-      newState->AddParticle(particles[i], logWeights[i] + model->GetLogLikelihood(particles[i], control, disturbance));
+    auto newState = std::make_shared<State>(particles, logWeights);
+    Eigen::VectorXd logLikelihoods(particles.size());
+    for (int i = 0; i < particles.size(); ++i)
+      logLikelihoods(i) = model->GetLogLikelihood(particles(i), control, disturbance);
+    newState->logWeights += logLikelihoods;
     return newState;
   }
 
-  // get a sample from the state
   inline double GetSample()
   {
-    double sumWeights = 0;
-    for (size_t i = 0; i < particles.size(); ++i) {
-      sumWeights += exp(logWeights[i]);
-    }
+    double sumWeights = logWeights.array().exp().sum();
     double sum = 0;
     double threshold = RandomGenerator::GetUniform();
-    for (size_t i = 0; i < particles.size(); ++i) {
+    for (int i = 0; i < particles.size(); ++i) {
       double weight = exp(logWeights[i]);
       sum += weight;
       if (sum / sumWeights > threshold) {
         return particles[i];
       }
     }
-    return particles[particles.size()-1];
-  }
-
-  inline Eigen::MatrixXd GetEigenMatrix()
-  {
-    Eigen::MatrixXd matrix(particles.size(), 2);
-    for (size_t i = 0; i < particles.size(); ++i) {
-      matrix(i, 0) = particles[i];
-      matrix(i, 1) = logWeights[i];
-    }
-    return matrix;
+    return particles[particles.size() - 1];
   }
 
 };

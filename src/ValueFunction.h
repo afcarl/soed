@@ -11,14 +11,12 @@
 class ValueFunction
 {
 
-private:
+public:
 
   // Collection of basis functions that take the first two moments from State::GetMoments()
   static std::vector<std::function<double(double, double)>> basisFunctions;
 
   Eigen::VectorXd coefficients;
-
-public:
 
   inline Eigen::VectorXd GetCoefficients() { return coefficients; }
   virtual double Evaluate(std::shared_ptr<State> state);

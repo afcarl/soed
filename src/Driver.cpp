@@ -12,15 +12,15 @@ using namespace Eigen;
 
 int main(int argc, char** argv) {
 
-  int numStages          = GetOption<int>(argc, argv, "-numStages", 3);
-  int numTrainingSamples = GetOption<int>(argc, argv, "-numTrainingSamples", 100);
-  int numParticles       = GetOption<int>(argc, argv, "-numParticles", 1000);
+  int numStages          = GetOption<int>(argc, argv, "-numStages", 4);
+  int numTrainingSamples = GetOption<int>(argc, argv, "-numTrainingSamples", 1000);
+  int numParticles       = GetOption<int>(argc, argv, "-numParticles", 2000);
   int numGridpoints      = GetOption<int>(argc, argv, "-numGridpoints", 21);
-  int numExpectation     = GetOption<int>(argc, argv, "-numExpectation", 100);
+  int numExpectation     = GetOption<int>(argc, argv, "-numExpectation", 500);
 
   double priorMean       = GetOption<double>(argc, argv, "-priorMean", 0.0);
   double priorVariance   = GetOption<double>(argc, argv, "-priorVariance", 1.0);
-  double noiseVariance   = GetOption<double>(argc, argv, "-noiseVariance", 0.01);
+  double noiseVariance   = GetOption<double>(argc, argv, "-noiseVariance", 0.04);
 
   double trueTheta       = GetOption<double>(argc, argv, "-trueTheta", 0.5);
 
@@ -39,9 +39,9 @@ int main(int argc, char** argv) {
   solver->SetNumExpectation(numExpectation);
 
   // create prior State
-  auto prior = make_shared<State>();
+  auto prior = make_shared<State>(VectorXd::Zero(numParticles), VectorXd::Zero(numParticles));
   for (int i = 0; i < numParticles; ++i)
-    prior->AddParticle(model->GetPriorSample());
+    prior->particles(i) = model->GetPriorSample();
 
   // compute optimal policy
   solver->Solve(prior);
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
   // execute the optimal policy on some synthetic data
 
   vector<shared_ptr<State>> states(numStages);
-  VectorXd controls(numStages);
+  VectorXd controls(numStages - 1);
   VectorXd costsToGo(numStages);
   VectorXd disturbances(numStages);
 
@@ -67,11 +67,21 @@ int main(int argc, char** argv) {
   WriteEigenBinaryFile(prefix + ".controls", controls);
 
   // concatenate state matrices
-  MatrixXd stateMatrix(numParticles, 2 * numStages);
+  MatrixXd particles(numParticles, numStages);
+  MatrixXd weights(numParticles, numStages);
   for (int k = 0; k < numStages; ++k) {
-    stateMatrix.block(0, 2 * k, numParticles, 2) = states[k]->GetEigenMatrix();
+    particles.col(k) = states[k]->particles;
+    weights.col(k) = states[k]->logWeights.array().exp();
   }
-  WriteEigenBinaryFile(prefix + ".states", stateMatrix);
+  WriteEigenBinaryFile(prefix + ".particles", particles);
+  WriteEigenBinaryFile(prefix + ".weights", weights);
+
+  // value function coefficients
+  MatrixXd coefficients(ValueFunction::basisFunctions.size(), numStages - 1);
+  for (int k = 0; k < numStages - 1; ++k) {
+    coefficients.col(k) = solver->valueFunctions[k]->coefficients;
+  }
+  WriteEigenBinaryFile(prefix + ".coefficients", coefficients);
 
   return 0;
 

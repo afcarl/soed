@@ -13,7 +13,7 @@
 class DPSolver
 {
 
-private:
+public:
 
   int numStages;
   std::shared_ptr<Model> model;
@@ -21,8 +21,6 @@ private:
   int numGridpoints;
   int numExpectation;
   std::vector<std::shared_ptr<ValueFunction>> valueFunctions;
-
-public:
 
   inline void SetNumStages(const int numStages) { this->numStages = numStages; }
   inline void SetModel(std::shared_ptr<Model> model) { this->model = model; }
@@ -38,11 +36,6 @@ public:
 
   // solves Bellman's equation
   void Solve(std::shared_ptr<State> prior);
-
-private:
-
-  void ComputeTrainingPoints();
-  void TrainValueFunctions();
 
 };
 
