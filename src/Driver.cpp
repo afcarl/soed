@@ -12,15 +12,15 @@ using namespace Eigen;
 
 int main(int argc, char** argv) {
 
-  int numStages          = GetOption<int>(argc, argv, "-numStages", 4);
+  int numStages          = GetOption<int>(argc, argv, "-numStages", 5);
   int numTrainingSamples = GetOption<int>(argc, argv, "-numTrainingSamples", 1000);
   int numParticles       = GetOption<int>(argc, argv, "-numParticles", 2000);
   int numGridpoints      = GetOption<int>(argc, argv, "-numGridpoints", 21);
-  int numExpectation     = GetOption<int>(argc, argv, "-numExpectation", 500);
+  int numExpectation     = GetOption<int>(argc, argv, "-numExpectation", 1000);
 
   double priorMean       = GetOption<double>(argc, argv, "-priorMean", 0.0);
   double priorVariance   = GetOption<double>(argc, argv, "-priorVariance", 1.0);
-  double noiseVariance   = GetOption<double>(argc, argv, "-noiseVariance", 0.04);
+  double noiseVariance   = GetOption<double>(argc, argv, "-noiseVariance", 0.02);
 
   double trueTheta       = GetOption<double>(argc, argv, "-trueTheta", 0.5);
 
