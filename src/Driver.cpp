@@ -13,10 +13,10 @@ using namespace Eigen;
 int main(int argc, char** argv) {
 
   int numStages          = GetOption<int>(argc, argv, "-numStages", 5);
-  int numTrainingSamples = GetOption<int>(argc, argv, "-numTrainingSamples", 1000);
-  int numParticles       = GetOption<int>(argc, argv, "-numParticles", 2000);
+  int numTrajectories    = GetOption<int>(argc, argv, "-numTrajectories", 1000);
+  int numParticles       = GetOption<int>(argc, argv, "-numParticles", 1000);
   int numGridpoints      = GetOption<int>(argc, argv, "-numGridpoints", 21);
-  int numExpectation     = GetOption<int>(argc, argv, "-numExpectation", 1000);
+  int numExpectation     = GetOption<int>(argc, argv, "-numExpectation", 100);
 
   double priorMean       = GetOption<double>(argc, argv, "-priorMean", 0.0);
   double priorVariance   = GetOption<double>(argc, argv, "-priorVariance", 1.0);
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
   auto solver = make_shared<DPSolver>();
   solver->SetNumStages(numStages);
   solver->SetModel(model);
-  solver->SetNumTrainingSamples(numTrainingSamples);
+  solver->SetNumTrajectories(numTrajectories);
   solver->SetNumGridpoints(numGridpoints);
   solver->SetNumExpectation(numExpectation);
 

@@ -14,12 +14,13 @@ private:
   double priorMean;
   double priorVariance;
   double noiseVariance;
+  double logConstant;
 
 public:
 
   inline void SetPriorMean(const double priorMean) { this->priorMean = priorMean; }
   inline void SetPriorVariance(const double priorVariance) { this->priorVariance = priorVariance; }
-  inline void SetNoiseVariance(const double noiseVariance) { this->noiseVariance = noiseVariance; }
+  inline void SetNoiseVariance(const double noiseVariance) { this->noiseVariance = noiseVariance; logConstant = log(2.0 * M_PI * noiseVariance); }
 
   inline double Evaluate(const double theta, const double control)
   {
@@ -29,7 +30,7 @@ public:
   inline double GetLogLikelihood(double theta, double control, double disturbance) override
   {
     double output = Evaluate(theta, control);
-    return -0.5 * log(2.0 * M_PI * noiseVariance) - (output - disturbance) * (output - disturbance) / (2.0 * noiseVariance);
+    return -0.5 * logConstant - (output - disturbance) * (output - disturbance) / (2.0 * noiseVariance);
   }
 
   inline double GetNoiseSample() override

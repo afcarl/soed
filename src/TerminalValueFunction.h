@@ -17,10 +17,6 @@ public:
     return state->GetKL(prior);
   }
 
-  inline virtual void Train(const std::vector<std::shared_ptr<State>> states, const Eigen::VectorXd& costs) override
-  {
-    // pass
-  }
 
 };
 
