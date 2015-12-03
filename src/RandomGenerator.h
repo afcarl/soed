@@ -33,6 +33,14 @@ class RandomGenerator
       return uniformDist(RandomGenerator::engine);
     }
 
+    // min and max are inclusive
+    inline static int GetInt(int min = 0, int max = 1)
+    {
+      RandomGenerator::Initialize();
+      std::uniform_int_distribution<> uniformDist(min, max);
+      return uniformDist(RandomGenerator::engine);
+    }
+
 };
 
 #endif // ifndef RandomGenerator_h

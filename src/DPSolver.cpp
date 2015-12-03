@@ -7,6 +7,20 @@
 using namespace std;
 using namespace Eigen;
 
+VectorXd DPSolver::GetControls()
+{
+  return VectorXd::LinSpaced(numGridpoints, -1, 1);
+}
+
+std::pair<double, double> DPSolver::GetControlPair(const Eigen::VectorXd& values)
+{
+  VectorXd::Index optimalIndex;
+  VectorXd controls = GetControls();
+  double optimalValue = values.maxCoeff(&optimalIndex);
+  double optimalControl = controls(optimalIndex);
+  return make_pair(optimalControl, optimalValue);
+}
+
 void DPSolver::SetValueFunctionCoefficients(const MatrixXd& coefficients, shared_ptr<State> prior)
 {
   assert(coefficients.cols() == numStages - 1);
@@ -19,10 +33,10 @@ void DPSolver::SetValueFunctionCoefficients(const MatrixXd& coefficients, shared
 }
 
 // returns optimal control and value
-pair<double, double> DPSolver::GetOptimalControl(shared_ptr<State> state, shared_ptr<ValueFunction> nextValueFunction)
+VectorXd DPSolver::GetOptimalValues(shared_ptr<State> state, shared_ptr<ValueFunction> nextValueFunction)
 {
   // enumerate all controls and values on a grid
-  VectorXd controls = VectorXd::LinSpaced(numGridpoints, -1, 1);
+  VectorXd controls = GetControls();
   VectorXd values = VectorXd::Zero(numGridpoints);
   VectorXd theta(numExpectation);
   VectorXd noise(numExpectation);
@@ -39,16 +53,12 @@ pair<double, double> DPSolver::GetOptimalControl(shared_ptr<State> state, shared
     }
     values(i) = value / numExpectation;
   }
-  // return optimal control and value among enumerated values
-  VectorXd::Index optimalIndex;
-  double optimalValue = values.maxCoeff(&optimalIndex);
-  double optimalControl = controls(optimalIndex);
-  return make_pair(optimalControl, optimalValue);
+  return values;
 }
 
-pair<double, double> DPSolver::GetOptimalControl(shared_ptr<State> state, const int stage)
+VectorXd DPSolver::GetOptimalValues(shared_ptr<State> state, const int stage)
 {
-  return GetOptimalControl(state, valueFunctions[stage + 1]);
+  return GetOptimalValues(state, valueFunctions[stage + 1]);
 }
 
 // solves Bellman's equation
@@ -60,13 +70,14 @@ void DPSolver::Solve(shared_ptr<State> prior)
     valueFunctions[i] = make_shared<ValueFunction>();
   valueFunctions[numStages - 1] = make_shared<TerminalValueFunction>(prior);
   // compute training points
+  VectorXd controls = GetControls();
   VectorXd priorSamples(numTrajectories);
   vector<vector<shared_ptr<State>>> trajectories(numTrajectories); // for each prior sample, compute trajectory of states
   #pragma omp parallel for ordered schedule(dynamic)
   for (int i = 0; i < numTrajectories; ++i) {
     trajectories[i].push_back(prior->GetCopy());
     for (int k = 1; k < numStages; ++k) {
-      double control = RandomGenerator::GetUniform() * 2 - 1; // control between [-1, 1]
+      double control = controls(RandomGenerator::GetInt(0, numGridpoints - 1));
       double disturbance = model->GetDisturbance(priorSamples(i), control);
       trajectories[i].push_back(trajectories[i][k - 1]->GetNextState(model, control, disturbance));
     }
@@ -80,9 +91,9 @@ void DPSolver::Solve(shared_ptr<State> prior)
     #pragma omp parallel for ordered schedule(dynamic)
     for (int i = 0; i < numTrajectories; ++i) {
       printf("%d/%d\r", i+1, numTrajectories); fflush(stdout);
-      auto controlPair = GetOptimalControl(trajectories[i][k], valueFunctions[k + 1]);
+      auto controlValues = GetOptimalValues(trajectories[i][k], valueFunctions[k + 1]);
       states[i] = trajectories[i][k];
-      values(i) = controlPair.second;
+      values(i) = controlValues.maxCoeff();
     }
     valueFunctions[k]->Train(states, values);
   }
@@ -90,10 +101,10 @@ void DPSolver::Solve(shared_ptr<State> prior)
 
 }
 
-pair<double, double> DPSolver::GetGreedyControl(shared_ptr<State> state)
+VectorXd DPSolver::GetGreedyValues(shared_ptr<State> state)
 {
   // enumerate all controls and values on a grid
-  VectorXd controls = VectorXd::LinSpaced(numGridpoints, -1, 1);
+  VectorXd controls = GetControls();
   VectorXd values = VectorXd::Zero(numGridpoints);
   VectorXd theta(numExpectation);
   VectorXd noise(numExpectation);
@@ -101,7 +112,9 @@ pair<double, double> DPSolver::GetGreedyControl(shared_ptr<State> state)
     theta(i) = state->GetSample();
     noise(i) = model->GetNoiseSample();
   }
+  #pragma omp parallel for ordered schedule(dynamic)
   for (int i = 0; i < numGridpoints; ++i) {
+    printf("%d/%d\r", i+1, numGridpoints); fflush(stdout);
     double value = 0;
     for (int j = 0; j < numExpectation; ++j) {
       auto disturbance = model->GetDisturbance(theta(j), controls(i), noise(j));
@@ -110,9 +123,6 @@ pair<double, double> DPSolver::GetGreedyControl(shared_ptr<State> state)
     }
     values(i) = value / numExpectation;
   }
-  // return optimal control and value among enumerated values
-  VectorXd::Index optimalIndex;
-  double optimalValue = values.maxCoeff(&optimalIndex);
-  double optimalControl = controls(optimalIndex);
-  return make_pair(optimalControl, optimalValue);
+  printf("\nDone\n");
+  return values;
 }

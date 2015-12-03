@@ -18,6 +18,7 @@ public:
   Eigen::VectorXd particles;
   Eigen::VectorXd logWeights;
   double sumWeights;
+  bool hasSumWeights;
   std::pair<double, double> moments;
   bool hasMoments;
 

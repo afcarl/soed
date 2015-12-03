@@ -54,3 +54,4 @@ inline Eigen::MatrixXd ReadEigenBinaryFile(const std::string& path)
   file.close();
   return m;
 }
+

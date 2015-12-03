@@ -32,16 +32,15 @@ public:
 
   void SetValueFunctionCoefficients(const Eigen::MatrixXd& coefficients, std::shared_ptr<State> prior);
 
-  // returns optimal control and value as a std::pair
-  std::pair<double, double> GetOptimalControl(std::shared_ptr<State> state, std::shared_ptr<ValueFunction> nextValueFunction);
-
-  // returns optimal control and value as a std::pair, uses member variable valueFunctions indexed by stage
-  std::pair<double, double> GetOptimalControl(std::shared_ptr<State> state, const int stage);
-
-  std::pair<double, double> GetGreedyControl(std::shared_ptr<State> state);
+  Eigen::VectorXd GetOptimalValues(std::shared_ptr<State> state, std::shared_ptr<ValueFunction> nextValueFunction);
+  Eigen::VectorXd GetOptimalValues(std::shared_ptr<State> state, const int stage);
+  Eigen::VectorXd GetGreedyValues(std::shared_ptr<State> state);
 
   // solves Bellman's equation
   void Solve(std::shared_ptr<State> prior);
+
+  Eigen::VectorXd GetControls();
+  std::pair<double, double> GetControlPair(const Eigen::VectorXd& values);
 
 };
 

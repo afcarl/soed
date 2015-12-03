@@ -41,11 +41,9 @@ for k in range(1, stages - 1):
   fig.set_size_inches(6, 6)
   ax = fig.add_subplot(111, projection='3d')
   xmin, xmax = -1, 1
-  ymin, ymax = 0.01, 1.5
+  ymin, ymax = 10**(-3), 10**(0.25)
   nx, ny = 51, 51
-  if k > 0:
-    scaterplot = ax.scatter(means[:,k], variances[:,k], values[:,k], c='k', marker='o')
-    pass
+  scaterplot = ax.scatter(means[:,k], np.log10(variances[:,k]), values[:,k], c='k', marker='o', s=2, alpha=0.5)
   X = np.linspace(xmin, xmax, nx)
   Y = np.logspace(np.log10(ymin), np.log10(ymax), ny, base=10)
   X, Y = np.meshgrid(X, Y)
@@ -54,20 +52,17 @@ for k in range(1, stages - 1):
     for i in range(nx):
       for j in range(ny):
         Z[i, j] += coefficients[index, k] * value_function(X[i, j], Y[i, j])
-  surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm, alpha=0.8, linewidth=0, antialiased=True)
-  ax.set_zlim(np.min(Z) - (np.max(Z) - np.min(Z)) * 0.1, np.max(Z) + (np.max(Z) - np.min(Z)) * 0.1)
+  surf = ax.plot_surface(X, np.log10(Y), Z, rstride=1, cstride=1, cmap=cm.coolwarm, alpha=0.8, linewidth=0, antialiased=True)
   ax.set_xlim(xmin, xmax)
-  ax.set_ylim(ymin, ymax)
+  ax.set_ylim(np.log10(ymin), np.log10(ymax))
+  ax.set_zlim(np.min(Z) - (np.max(Z) - np.min(Z)) * 0.1, np.max(Z) + (np.max(Z) - np.min(Z)) * 0.1)
   ax.set_xlabel('mean')
-  ax.set_ylabel('variance')
-  cset = ax.contour(X, Y, Z, zdir='z', offset=ax.get_zlim()[0], cmap=cm.coolwarm)
-  # cset = ax.contour(X, Y, Z, zdir='x', offset=ax.get_xlim()[0], cmap=cm.coolwarm)
-  # cset = ax.contour(X, Y, Z, zdir='y', offset=ax.get_ylim()[1], cmap=cm.coolwarm)
+  ax.set_ylabel('log10(variance)')
+  cset = ax.contour(X, np.log10(Y), Z, 15, zdir='z', offset=ax.get_zlim()[0], cmap=cm.coolwarm)
   ax.yaxis.set_major_locator(LinearLocator(5))
   ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
   ax.zaxis.set_major_locator(LinearLocator(5))
   ax.zaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-  # fig.colorbar(surf, shrink=0.5, aspect=5)
-  # plt.savefig('%s_%d.png' % (prefix, k), bbox_inches='tight')
-  plt.show()
+  plt.savefig('%s_%d.pdf' % (prefix, k), bbox_inches='tight')
+  # plt.show()
 

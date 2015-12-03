@@ -13,10 +13,10 @@ using namespace Eigen;
 int main(int argc, char** argv) {
 
   int numStages           = GetOption<int>(argc, argv, "-numStages", 4);
-  int numTrajectories     = GetOption<int>(argc, argv, "-numTrajectories", 100);
-  int numParticles        = GetOption<int>(argc, argv, "-numParticles", 5000);
+  int numTrajectories     = GetOption<int>(argc, argv, "-numTrajectories", 500);
+  int numParticles        = GetOption<int>(argc, argv, "-numParticles", 2000);
   int numGridpoints       = GetOption<int>(argc, argv, "-numGridpoints", 21);
-  int numExpectation      = GetOption<int>(argc, argv, "-numExpectation", 1000);
+  int numExpectation      = GetOption<int>(argc, argv, "-numExpectation", 500);
 
   double priorMean        = GetOption<double>(argc, argv, "-priorMean", 0.0);
   double priorVariance    = GetOption<double>(argc, argv, "-priorVariance", 1.0);
@@ -67,24 +67,27 @@ int main(int argc, char** argv) {
     return 1;
   }
 
+  MatrixXd controlValues = MatrixXd::Zero(numGridpoints, numStages - 1);
+
   // execute the policy for some true theta
 
   vector<shared_ptr<State>> states(numStages);
   VectorXd controls(numStages - 1);
-  VectorXd costsToGo(numStages);
   VectorXd disturbances(numStages);
 
   states[0] = prior;
 
   for (int k = 0; k < numStages - 1; ++k) {
     if (algorithm == "dp") {
-      auto controlPair = solver->GetOptimalControl(states[k], k);
+      auto values = solver->GetOptimalValues(states[k], k);
+      auto controlPair = solver->GetControlPair(values);
+      controlValues.col(k) = values;
       controls[k]      = controlPair.first;
-      costsToGo[k]     = controlPair.second;
     } else if (algorithm == "greedy") {
-      auto controlPair = solver->GetGreedyControl(states[k]);
+      auto values = solver->GetGreedyValues(states[k]);
+      auto controlPair = solver->GetControlPair(values);
+      controlValues.col(k) = values;
       controls[k]      = controlPair.first;
-      costsToGo[k]     = controlPair.second;
     } else if (algorithm == "naive") {
       auto grid = VectorXd::LinSpaced(numStages - 1, -1, 1);
       controls[k] = grid(k);
@@ -112,6 +115,10 @@ int main(int argc, char** argv) {
   }
   WriteEigenBinaryFile(prefix + ".particles", particles);
   WriteEigenBinaryFile(prefix + ".weights", weights);
+
+  if (algorithm == "dp" || algorithm == "greedy") {
+    WriteEigenBinaryFile(prefix + ".controlValues", controlValues);
+  }
 
   // value function coefficients and training data
   if (algorithm == "dp" && coefficientsFile.empty()) {
