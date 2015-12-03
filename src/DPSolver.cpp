@@ -73,7 +73,7 @@ void DPSolver::Solve(shared_ptr<State> prior)
   }
 
   printf("Training value functions\n");
-  for (int k = numStages - 2; k >= 0; --k) {
+  for (int k = numStages - 2; k >= 1; --k) {
     printf("Computing values for stage k = %d\n", k);
     vector<shared_ptr<State>> states(numTrajectories);
     VectorXd values(numTrajectories);

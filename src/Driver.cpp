@@ -13,8 +13,8 @@ using namespace Eigen;
 int main(int argc, char** argv) {
 
   int numStages           = GetOption<int>(argc, argv, "-numStages", 4);
-  int numTrajectories     = GetOption<int>(argc, argv, "-numTrajectories", 2000);
-  int numParticles        = GetOption<int>(argc, argv, "-numParticles", 2000);
+  int numTrajectories     = GetOption<int>(argc, argv, "-numTrajectories", 100);
+  int numParticles        = GetOption<int>(argc, argv, "-numParticles", 5000);
   int numGridpoints       = GetOption<int>(argc, argv, "-numGridpoints", 21);
   int numExpectation      = GetOption<int>(argc, argv, "-numExpectation", 1000);
 
@@ -115,11 +115,11 @@ int main(int argc, char** argv) {
 
   // value function coefficients and training data
   if (algorithm == "dp" && coefficientsFile.empty()) {
-    MatrixXd coefficients(ValueFunction::basisFunctions.size(), numStages - 1);
-    MatrixXd trainingMeans(numTrajectories, numStages - 1);
-    MatrixXd trainingVariances(numTrajectories, numStages - 1);
-    MatrixXd trainingValues(numTrajectories, numStages - 1);
-    for (int k = 0; k < numStages - 1; ++k) {
+    MatrixXd coefficients = MatrixXd::Zero(ValueFunction::basisFunctions.size(), numStages - 1);
+    MatrixXd trainingMeans = MatrixXd::Zero(numTrajectories, numStages - 1);
+    MatrixXd trainingVariances = MatrixXd::Zero(numTrajectories, numStages - 1);
+    MatrixXd trainingValues = MatrixXd::Zero(numTrajectories, numStages - 1);
+    for (int k = 1; k < numStages - 1; ++k) {
       coefficients.col(k) = solver->valueFunctions[k]->coefficients;
       trainingMeans.col(k) = solver->valueFunctions[k]->trainingMeans;
       trainingVariances.col(k) = solver->valueFunctions[k]->trainingVariances;

@@ -14,18 +14,18 @@ def weighted_kde(particles, weights, width):
     return 0.1 * np.sum(weights / np.sqrt(2.0 * np.pi * width**2) * np.exp(-(particles-x)**2 / (2.0 * width))) / np.sum(weights)
   return fn
 
-prefix = 'dp'
+prefix = 'greedy'
 
 controls     = read_binary_file(prefix + '.controls')
 particles    = read_binary_file(prefix + '.particles')
 weights      = read_binary_file(prefix + '.weights')
-coefficients = read_binary_file(prefix + '.coefficients')
+#coefficients = read_binary_file(prefix + '.coefficients')
 
 print controls
-print coefficients
+#print coefficients
 
 import matplotlib
-matplotlib.use('PDF')
+# matplotlib.use('PDF')
 
 from matplotlib import pyplot as plt
 
@@ -55,5 +55,5 @@ for k in range(len(controls)):
   kdefn = weighted_kde(particles[:,k], weights[:,k], bandwidths[k])
   plt.plot(controls[k], kdefn(controls[k]), 'o', color=colors[k], mew=0)
 
-plt.savefig(prefix + '.pdf', bbox_inches='tight')
+plt.savefig(prefix + '.png', dpi=300, bbox_inches='tight')
 
