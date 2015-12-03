@@ -35,3 +35,22 @@ inline void WriteEigenBinaryFile(const std::string& path, const Eigen::MatrixXd&
   }
   file.close();
 }
+
+inline Eigen::MatrixXd ReadEigenBinaryFile(const std::string& path)
+{
+  std::ifstream file;
+  file.open(path, std::ios::in | std::ios::binary);
+  int rows, cols;
+  file.read(reinterpret_cast<char *>(&rows), sizeof(rows));
+  file.read(reinterpret_cast<char *>(&cols), sizeof(cols));
+  Eigen::MatrixXd m(rows, cols);
+  for (int i = 0; i < rows; ++i) {
+    for (int j = 0; j < cols; ++j) {
+      double entry;
+      file.read(reinterpret_cast<char *>(&entry), sizeof(double));
+      m(i, j) = entry;
+    }
+  }
+  file.close();
+  return m;
+}

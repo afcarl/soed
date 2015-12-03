@@ -14,7 +14,7 @@ def weighted_kde(particles, weights, width):
     return 0.1 * np.sum(weights / np.sqrt(2.0 * np.pi * width**2) * np.exp(-(particles-x)**2 / (2.0 * width))) / np.sum(weights)
   return fn
 
-prefix = 'test'
+prefix = 'dp'
 
 controls     = read_binary_file(prefix + '.controls')
 particles    = read_binary_file(prefix + '.particles')

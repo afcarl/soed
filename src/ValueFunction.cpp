@@ -1,4 +1,5 @@
 #include <functional>
+#include <iostream>
 #include <Eigen/Dense>
 #include "ValueFunction.h"
 
@@ -15,18 +16,27 @@ std::vector<std::function<double(double, double)>> ValueFunction::basisFunctions
 
 double ValueFunction::Evaluate(std::shared_ptr<State> state)
 {
+  auto moments = state->GetMoments();
   double sum = 0;
   for (size_t i = 0; i < basisFunctions.size(); ++i)
-    sum += coefficients(i) * basisFunctions[i](state->moments.first, state->moments.second);
+    sum += coefficients(i) * basisFunctions[i](moments.first, moments.second);
   return sum;
 }
 
-void ValueFunction::Train(const std::vector<std::shared_ptr<State>> states, const Eigen::VectorXd& costs)
+void ValueFunction::Train(const std::vector<std::shared_ptr<State>> states, const Eigen::VectorXd& values)
 {
+  trainingMeans = Eigen::VectorXd::Zero(states.size());
+  trainingVariances = Eigen::VectorXd::Zero(states.size());
+  trainingValues = Eigen::VectorXd::Zero(states.size());
   Eigen::MatrixXd X(states.size(), basisFunctions.size());
   for (size_t i = 0; i < states.size(); ++i) {
+    auto moments = states[i]->GetMoments();
+    trainingMeans(i) = moments.first;
+    trainingVariances(i) = moments.second;
+    trainingValues(i) = values(i);
     for (size_t j = 0; j < basisFunctions.size(); ++j)
-      X(i, j) = basisFunctions[j](states[i]->moments.first, states[i]->moments.second);
+      X(i, j) = basisFunctions[j](moments.first, moments.second);
   }
-  coefficients = (X.transpose() * X).ldlt().solve(X.transpose() * costs);
+  coefficients = (X.transpose() * X).ldlt().solve(X.transpose() * values);
+  std::cout << coefficients.transpose() << std::endl;
 }

@@ -17,10 +17,13 @@ public:
   static std::vector<std::function<double(double, double)>> basisFunctions;
 
   Eigen::VectorXd coefficients;
+  Eigen::VectorXd trainingMeans;
+  Eigen::VectorXd trainingVariances;
+  Eigen::VectorXd trainingValues;
 
   inline Eigen::VectorXd GetCoefficients() { return coefficients; }
   virtual double Evaluate(std::shared_ptr<State> state);
-  virtual void Train(const std::vector<std::shared_ptr<State>> states, const Eigen::VectorXd& costs);
+  virtual void Train(const std::vector<std::shared_ptr<State>> states, const Eigen::VectorXd& values);
 
 };
 

@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <iostream>
 #include <cassert>
 #include <Eigen/Core>
 #include "DPSolver.h"
@@ -58,15 +59,11 @@ void DPSolver::Solve(shared_ptr<State> prior)
   for (int i = 0; i < numStages - 1; ++i)
     valueFunctions[i] = make_shared<ValueFunction>();
   valueFunctions[numStages - 1] = make_shared<TerminalValueFunction>(prior);
-
-  printf("Computing training points\n");
-
   // compute training points
   VectorXd priorSamples(numTrajectories);
   vector<vector<shared_ptr<State>>> trajectories(numTrajectories); // for each prior sample, compute trajectory of states
   #pragma omp parallel for ordered schedule(dynamic)
   for (int i = 0; i < numTrajectories; ++i) {
-    printf("%d/%d\r", i+1, numTrajectories); fflush(stdout);
     trajectories[i].push_back(prior->GetCopy());
     for (int k = 1; k < numStages; ++k) {
       double control = RandomGenerator::GetUniform() * 2 - 1; // control between [-1, 1]
@@ -74,7 +71,6 @@ void DPSolver::Solve(shared_ptr<State> prior)
       trajectories[i].push_back(trajectories[i][k - 1]->GetNextState(model, control, disturbance));
     }
   }
-  printf("\nDone\n");
 
   printf("Training value functions\n");
   for (int k = numStages - 2; k >= 0; --k) {
@@ -88,10 +84,9 @@ void DPSolver::Solve(shared_ptr<State> prior)
       states[i] = trajectories[i][k];
       values(i) = controlPair.second;
     }
-    printf("Computing linear least squares\n");
     valueFunctions[k]->Train(states, values);
   }
-  printf("Done\n");
+  printf("\nDone\n");
 
 }
 
